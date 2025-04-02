@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import cardImage from '../assets/card-image.png';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import cardImage from "../assets/card-image.png";
+import quizBg from "../assets/quiz-bg.png";
 
 interface Question {
   question: string;
@@ -10,19 +11,31 @@ interface Question {
 
 const questions: Question[] = [
   {
-    question: 'What is a Blockchain?',
-    options: ['A type of cryptocurrency', 'decentralized ledger', 'centralized database'],
-    correctAnswer: 'decentralized ledger',
+    question: "What is a Blockchain?",
+    options: [
+      "A type of cryptocurrency",
+      "decentralized ledger",
+      "centralized database",
+    ],
+    correctAnswer: "decentralized ledger",
   },
   {
-    question: 'What does NFT stand for?',
-    options: ['Non-Fungible Token', 'New Financial Technology', 'Network File Transfer'],
-    correctAnswer: 'Non-Fungible Token',
+    question: "What does NFT stand for?",
+    options: [
+      "Non-Fungible Token",
+      "New Financial Technology",
+      "Network File Transfer",
+    ],
+    correctAnswer: "Non-Fungible Token",
   },
   {
-    question: 'What is the primary purpose of a smart contract?',
-    options: ['To mine cryptocurrency', 'To automate agreements', 'To store data'],
-    correctAnswer: 'To automate agreements',
+    question: "What is the primary purpose of a smart contract?",
+    options: [
+      "To mine cryptocurrency",
+      "To automate agreements",
+      "To store data",
+    ],
+    correctAnswer: "To automate agreements",
   },
   // Add more questions as needed
 ];
@@ -84,30 +97,30 @@ const QuizGame: React.FC = () => {
   };
 
   const handleBackToHome = () => {
-    navigate('/');
+    navigate("/");
   };
 
   if (gameOver) {
     return (
       <div className="relative min-h-screen flex flex-col items-center justify-center p-4">
-        {/* Background Video */}
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover z-0"
-        >
-          <source src="/background-video.mp4" type="video/mp4" />
-        </video>
-        <div className="absolute inset-0 bg-black bg-opacity-70 z-10"></div>
+       {/* Background Image */}
+  <img
+    src={quizBg}
+    alt="background"
+    className="absolute inset-0 w-full h-full object-cover z-0"
+  />
+  
 
         {/* Summary */}
         <div className="relative z-20 text-white text-center">
           <h1 className="text-3xl font-bold mb-4">Game Over!</h1>
-          <p className="text-lg mb-2">Total Questions Answered: {answeredQuestions}</p>
+          <p className="text-lg mb-2">
+            Total Questions Answered: {answeredQuestions}
+          </p>
           <p className="text-lg mb-2">Correct Answers: {correctAnswers}</p>
-          <p className="text-lg mb-4">Missed Answers: {answeredQuestions - correctAnswers}</p>
+          <p className="text-lg mb-4">
+            Missed Answers: {answeredQuestions - correctAnswers}
+          </p>
 
           {missedQuestions.length > 0 && (
             <div className="mb-4">
@@ -145,24 +158,23 @@ const QuizGame: React.FC = () => {
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center p-4">
-      {/* Background Video */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
+     
+      {/* Background Image */}
+      <img
+        src={quizBg}
+        alt="background"
         className="absolute inset-0 w-full h-full object-cover z-0"
-      >
-        <source src="/background-video.mp4" type="video/mp4" />
-      </video>
-      <div className="absolute inset-0 bg-black bg-opacity-70 z-10"></div>
+      />
+     
 
       {/* Quiz Content */}
       <div className="relative z-20 w-full max-w-4xl">
         {/* Timer and Question Counter */}
         <div className="flex justify-between items-center mb-4 text-white">
           <p className="text-lg">Time Left: {timeLeft}s</p>
-          <p className="text-lg">Question {currentQuestionIndex + 1} of {questions.length}</p>
+          <p className="text-lg">
+            Question {currentQuestionIndex + 1} of {questions.length}
+          </p>
         </div>
 
         {/* Answers Label */}
@@ -178,11 +190,11 @@ const QuizGame: React.FC = () => {
               alt="Card"
               className="absolute inset-0 w-full h-full object-cover"
             />
-            <div className="absolute top-2 sm:top-4 left-2 sm:left-4 bg-black bg-opacity-50 text-white px-1 sm:px-2 py-1 rounded text-xs sm:text-sm">
-              P2W2LEARN Quiz Challenge
-            </div>
+
             <div className="relative z-10 bg-white text-black px-2 sm:px-4 py-1 sm:py-2 w-3/4 text-center rounded-t-lg">
-              <p className="text-sm sm:text-lg font-bold">{currentQuestion.question}</p>
+              <p className="text-sm sm:text-lg font-bold">
+                {currentQuestion.question}
+              </p>
             </div>
           </div>
           <div className="relative w-full sm:w-48 md:w-64 h-64 sm:h-80 md:h-[26rem] flex flex-col items-center justify-end">
@@ -191,9 +203,7 @@ const QuizGame: React.FC = () => {
               alt="Card"
               className="absolute inset-0 w-full h-full object-cover"
             />
-            <div className="absolute top-2 sm:top-4 left-2 sm:left-4 bg-black bg-opacity-50 text-white px-1 sm:px-2 py-1 rounded text-xs sm:text-sm">
-              P2W2LEARN Quiz Challenge
-            </div>
+
             <div className="relative z-10 bg-white text-black px-2 sm:px-4 py-1 sm:py-2 w-3/4 text-center rounded-t-lg">
               <p className="text-sm sm:text-lg font-bold">The Web3 Quest</p>
             </div>
@@ -204,9 +214,7 @@ const QuizGame: React.FC = () => {
               alt="Card"
               className="absolute inset-0 w-full h-full object-cover"
             />
-            <div className="absolute top-2 sm:top-4 left-2 sm:left-4 bg-black bg-opacity-50 text-white px-1 sm:px-2 py-1 rounded text-xs sm:text-sm">
-              P2W2LEARN Quiz Challenge
-            </div>
+
             <div className="relative z-10 bg-white text-black px-2 sm:px-4 py-1 sm:py-2 w-3/4 text-center rounded-t-lg">
               <p className="text-sm sm:text-lg font-bold">One Web3 Mep</p>
             </div>
