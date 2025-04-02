@@ -1,0 +1,18 @@
+import React from 'react';
+
+const Benefits: React.FC = () => {
+  return (
+    <div className="w-full p-4 bg-black bg-opacity-50 text-white rounded-lg">
+      <h2 className="text-lg sm:text-xl font-bold text-yellow-400 mb-4 text-center">
+        UNLOCK THESE AWESOME BENEFITS:
+      </h2>
+      <ul className="space-y-2 text-sm sm:text-base">
+        <li className="text-center">Learn crypto and Web3 through fun, interactive games.</li>
+        <li className="text-center">Connect with fellow learners and Web3 enthusiasts.</li>
+        <li className="text-center">EARN tokens and badges for completing challenges.</li>
+      </ul>
+    </div>
+  );
+};
+
+export default Benefits;
