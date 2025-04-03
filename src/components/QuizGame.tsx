@@ -3,42 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useWallet } from "../WalletContext";
 import cardImage from "../assets/card-image.png";
 import quizBg from "../assets/quiz-bg.png";
-
-interface Question {
-  question: string;
-  options: string[];
-  correctAnswer: string;
-}
-
-const questions: Question[] = [
-  {
-    question: "What is a Blockchain?",
-    options: [
-      "A type of cryptocurrency",
-      "decentralized ledger",
-      "centralized database",
-    ],
-    correctAnswer: "decentralized ledger",
-  },
-  {
-    question: "What does NFT stand for?",
-    options: [
-      "Non-Fungible Token",
-      "New Financial Technology",
-      "Network File Transfer",
-    ],
-    correctAnswer: "Non-Fungible Token",
-  },
-  {
-    question: "What is the primary purpose of a smart contract?",
-    options: [
-      "To mine cryptocurrency",
-      "To automate agreements",
-      "To store data",
-    ],
-    correctAnswer: "To automate agreements",
-  },
-];
+import { questions } from "./questions";
 
 const QuizGame: React.FC = () => {
   const { account, connectWallet, isConnecting } = useWallet();
@@ -53,6 +18,7 @@ const QuizGame: React.FC = () => {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [blink, setBlink] = useState(false);
+  const [activeCard, setActiveCard] = useState<number>(0); // Track which card (0, 1, or 2) is active
   const navigate = useNavigate();
 
   // Calculate score: 100 points per correct answer
@@ -80,15 +46,27 @@ const QuizGame: React.FC = () => {
     }
   }, [showFeedback]);
 
+  // Determine the questions for each card
+  const currentQuestion = questions[currentQuestionIndex];
+  const nextQuestion = questions[(currentQuestionIndex + 1) % questions.length];
+  const thirdQuestion = questions[(currentQuestionIndex + 2) % questions.length];
+
+  // Determine the active question based on the active card
+  const activeQuestion =
+    activeCard === 0
+      ? currentQuestion
+      : activeCard === 1
+      ? nextQuestion
+      : thirdQuestion;
+
   const handleAnswer = (selectedAnswer: string) => {
     if (gameOver || showFeedback) return;
 
-    const currentQuestion = questions[currentQuestionIndex];
     setSelectedAnswer(selectedAnswer);
     setShowFeedback(true);
 
     setAnsweredQuestions((prev) => prev + 1);
-    const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
+    const isCorrect = selectedAnswer === activeQuestion.correctAnswer;
 
     if (isCorrect) {
       setCorrectAnswers((prev) => prev + 1);
@@ -96,9 +74,9 @@ const QuizGame: React.FC = () => {
       setMissedQuestions((prev) => [
         ...prev,
         {
-          question: currentQuestion.question,
+          question: activeQuestion.question,
           userAnswer: selectedAnswer,
-          correctAnswer: currentQuestion.correctAnswer,
+          correctAnswer: activeQuestion.correctAnswer,
         },
       ]);
     }
@@ -110,8 +88,10 @@ const QuizGame: React.FC = () => {
     setShowFeedback(false);
     setSelectedAnswer(null);
     setBlink(false);
-    const nextIndex = (currentQuestionIndex + 1) % questions.length;
-    setCurrentQuestionIndex(nextIndex);
+    const nextQuestionIndex = (currentQuestionIndex + 1) % questions.length;
+    const nextCardIndex = (activeCard + 1) % 3; // Cycle through card positions (0, 1, 2)
+    setCurrentQuestionIndex(nextQuestionIndex);
+    setActiveCard(nextCardIndex);
   };
 
   const handleBackToHome = () => {
@@ -225,10 +205,6 @@ const QuizGame: React.FC = () => {
     );
   }
 
-  const currentQuestion = questions[currentQuestionIndex];
-  const nextQuestion = questions[(currentQuestionIndex + 1) % questions.length];
-  const thirdQuestion = questions[(currentQuestionIndex + 2) % questions.length];
-
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center p-4">
       <img src={quizBg} alt="background" className="absolute inset-0 w-full h-full object-cover z-0" />
@@ -239,30 +215,53 @@ const QuizGame: React.FC = () => {
         </div>
 
         <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 sm:items-end">
-          <div className="relative w-full sm:w-48 md:w-64 h-64 sm:h-80 md:h-96 flex flex-col items-center justify-end">
+          {/* First Card */}
+          <div className="relative w-full sm:w-48 md:w-64 h-64 sm:h-80 md:h-96 flex flex-col items-center justify-between">
             <img src={cardImage} alt="Card" className="absolute inset-0 w-full h-full object-cover" />
-            <div className="relative z-10 bg-white text-black px-2 sm:px-4 py-1 sm:py-2 w-3/4 text-center rounded-t-lg">
-              <p className="text-sm sm:text-lg font-bold">{currentQuestion.question}</p>
-            </div>
+            {activeCard === 0 && (
+              <div className="relative z-10 w-full h-full flex flex-col justify-between items-center bg-gradient-to-b from-purple-100 to-white border-2 border-purple-600 rounded-lg p-2">
+                <p className="text-black text-sm sm:text-base font-bold">The Web3 Quest</p>
+                <p className="text-purple-800 text-lg sm:text-2xl font-bold text-center px-2">
+                  {currentQuestion.question}
+                </p>
+                <p className="text-black text-sm sm:text-base font-bold">PLAY2LEARN</p>
+              </div>
+            )}
           </div>
+
+          {/* Second Card */}
           <div className="relative w-full sm:w-48 md:w-64 h-64 sm:h-80 md:h-96 flex flex-col items-center justify-end">
             <img src={cardImage} alt="Card" className="absolute inset-0 w-full h-full object-cover" />
-            <div className="relative z-10 bg-white text-black px-2 sm:px-4 py-1 sm:py-2 w-3/4 text-center rounded-t-lg">
-              <p className="text-sm sm:text-lg font-bold">{nextQuestion.question}</p>
-            </div>
+            {activeCard === 1 && (
+              <div className="relative z-10 w-full h-full flex flex-col justify-between items-center bg-gradient-to-b from-purple-100 to-white border-2 border-purple-600 rounded-lg p-2">
+                <p className="text-black text-sm sm:text-base font-bold">The Web3 Quest</p>
+                <p className="text-purple-800 text-lg sm:text-2xl font-bold text-center px-2">
+                  {nextQuestion.question}
+                </p>
+                <p className="text-black text-sm sm:text-base font-bold">PLAY2LEARN</p>
+              </div>
+            )}
           </div>
+
+          {/* Third Card */}
           <div className="relative w-full sm:w-48 md:w-64 h-64 sm:h-80 md:h-96 flex flex-col items-center justify-end">
             <img src={cardImage} alt="Card" className="absolute inset-0 w-full h-full object-cover" />
-            <div className="relative z-10 bg-white text-black px-2 sm:px-4 py-1 sm:py-2 w-3/4 text-center rounded-t-lg">
-              <p className="text-sm sm:text-lg font-bold">{thirdQuestion.question}</p>
-            </div>
+            {activeCard === 2 && (
+              <div className="relative z-10 w-full h-full flex flex-col justify-between items-center bg-gradient-to-b from-purple-100 to-white border-2 border-purple-600 rounded-lg p-2">
+                <p className="text-black text-sm sm:text-base font-bold">The Web3 Quest</p>
+                <p className="text-purple-800 text-lg sm:text-2xl font-bold text-center px-2">
+                  {thirdQuestion.question}
+                </p>
+                <p className="text-black text-sm sm:text-base font-bold">PLAY2LEARN</p>
+              </div>
+            )}
           </div>
         </div>
 
         <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mt-4 justify-center">
-          {currentQuestion.options.map((option, index) => {
+          {activeQuestion.options.map((option, index) => {
             const isSelected = selectedAnswer === option;
-            const isCorrect = option === currentQuestion.correctAnswer;
+            const isCorrect = option === activeQuestion.correctAnswer;
             let buttonClass = "text-white px-4 py-2 rounded-lg text-sm sm:text-base font-bold ";
 
             if (showFeedback) {
