@@ -145,7 +145,8 @@ const QuizGame: React.FC = () => {
         <img src={quizBg} alt="background" className="absolute inset-0 w-full h-full object-cover z-0" />
         <div className="relative z-20 text-white text-center">
           <h1 className="text-4xl font-bold mb-4 text-yellow-400">VICTORY</h1>
-          <p className="text-2xl mb-6">SCORE: {score}</p>
+          <p className="text-2xl mb-2">SCORE: {score}</p>
+          <p className="text-lg mb-6">Total Questions Answered: {answeredQuestions}</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Correct Answers Section */}
@@ -153,7 +154,7 @@ const QuizGame: React.FC = () => {
               <h2 className="text-xl font-bold mb-4">Correct Answers</h2>
               {correctAnswers > 0 ? (
                 questions
-                  .filter((q, index) => {
+                  .filter((q) => {
                     const missed = missedQuestions.find(
                       (m) => m.question === q.question
                     );
@@ -200,6 +201,9 @@ const QuizGame: React.FC = () => {
                       <p className="text-sm font-bold">{missed.question}</p>
                       <p className="text-sm text-red-400">
                         {missed.userAnswer}
+                      </p>
+                      <p className="text-sm text-green-400">
+                        Correct: {missed.correctAnswer}
                       </p>
                     </div>
                   </div>
