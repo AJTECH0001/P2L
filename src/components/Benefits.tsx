@@ -2,7 +2,12 @@ import React from 'react';
 
 const Benefits: React.FC = () => {
   return (
-    <div className="w-full p-4 bg-black bg-opacity-50 text-white rounded-lg">
+    <div
+      className="w-full p-4 text-white  rounded-lg"
+      style={{
+        background: 'linear-gradient(to bottom, #FFFFFF 0%, #999999 0%, #333333 100%)',
+      }}
+    >
       <h2 className="text-lg sm:text-xl font-bold text-yellow-400 mb-4 text-center">
         UNLOCK THESE AWESOME BENEFITS:
       </h2>

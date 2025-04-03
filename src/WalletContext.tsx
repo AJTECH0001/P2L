@@ -14,12 +14,17 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [account, setAccount] = useState<string | null>(null);
   const [providers, setProviders] = useState<any[]>([]);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [connectionAttempts, setConnectionAttempts] = useState(0);
 
   // Discover EIP-6963 providers
   useEffect(() => {
     const handleAnnounceProvider = (event: any) => {
       console.log("EIP-6963 Provider Announced:", event.detail);
       setProviders((prev) => {
+        // Prevent duplicate providers
+        if (prev.some(p => p.info.uuid === event.detail.info.uuid)) {
+          return prev;
+        }
         const newProviders = [...prev, event.detail];
         console.log("Updated Providers List:", newProviders);
         return newProviders;
@@ -28,7 +33,10 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
     console.log("Adding EIP-6963 event listener...");
     window.addEventListener("eip6963:announceProvider", handleAnnounceProvider);
-    window.dispatchEvent(new Event("eip6963:requestProvider"));
+    
+    // Request providers on mount
+    const requestEvent = new Event("eip6963:requestProvider");
+    window.dispatchEvent(requestEvent);
 
     return () => {
       console.log("Removing EIP-6963 event listener...");
@@ -36,8 +44,40 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     };
   }, []);
 
+  // Helper function for delayed retry with exponential backoff
+  const retry = async (fn: () => Promise<any>, maxAttempts: number, baseDelay: number = 500) => {
+    let attempt = 0;
+    
+    while (attempt < maxAttempts) {
+      try {
+        return await fn();
+      } catch (error: any) {
+        attempt++;
+        
+        // If it's a rate limit error and we haven't reached max attempts
+        if (error.code === -32005 && attempt < maxAttempts) {
+          const delay = baseDelay * Math.pow(2, attempt);
+          console.log(`Rate limit error. Retrying in ${delay}ms (attempt ${attempt}/${maxAttempts})`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
+        }
+        
+        // For other errors or if we've reached max attempts, throw the error
+        throw error;
+      }
+    }
+  };
+
   const connectWallet = useCallback(async () => {
+    // Don't allow multiple connection attempts
+    if (isConnecting) {
+      console.log("Connection already in progress. Please wait.");
+      return;
+    }
+    
     setIsConnecting(true);
+    setConnectionAttempts(prev => prev + 1);
+    
     try {
       console.log("Starting wallet connection process...");
       console.log("Available EIP-6963 providers:", providers);
@@ -65,9 +105,13 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         }
       }
 
-      // Request accounts
-      console.log("Requesting accounts...");
-      const accounts = await provider.send("eth_requestAccounts", []);
+      // Request accounts with retry mechanism
+      console.log("Requesting accounts with retry mechanism...");
+      const accounts = await retry(
+        async () => provider.send("eth_requestAccounts", []),
+        3  // Max 3 attempts
+      );
+      
       console.log("Accounts received:", accounts);
 
       if (accounts.length === 0) {
@@ -96,6 +140,8 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         alert("Connection request rejected. Please approve the connection in your wallet.");
       } else if (error.code === -32002) {
         alert("A connection request is already pending. Please check your wallet extension.");
+      } else if (error.code === -32005) {
+        alert("Request limit exceeded. Please wait a moment before trying again.");
       } else {
         alert(`Failed to connect to wallet: ${error.message || "Unknown error"}. Please try again.`);
       }
@@ -103,7 +149,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setIsConnecting(false);
       console.log("Connection process completed.");
     }
-  }, [providers]);
+  }, [providers, isConnecting]);
 
   const disconnectWallet = () => {
     setAccount(null);
@@ -124,3 +170,11 @@ export const useWallet = () => {
   }
   return context;
 };
+
+// For TypeScript global window object
+declare global {
+  interface Window {
+    ethereum?: any;
+    lukso?: any;
+  }
+}

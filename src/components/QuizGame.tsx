@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useWallet } from "../WalletContext"; // Import the useWallet hook
 import cardImage from "../assets/card-image.png";
 import quizBg from "../assets/quiz-bg.png";
 
@@ -37,10 +38,10 @@ const questions: Question[] = [
     ],
     correctAnswer: "To automate agreements",
   },
-  // Add more questions as needed
 ];
 
 const QuizGame: React.FC = () => {
+  const { account, connectWallet, isConnecting } = useWallet(); // Use wallet context
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answeredQuestions, setAnsweredQuestions] = useState<number>(0);
   const [correctAnswers, setCorrectAnswers] = useState<number>(0);
@@ -71,7 +72,6 @@ const QuizGame: React.FC = () => {
     const currentQuestion = questions[currentQuestionIndex];
     const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
 
-    // Update stats
     setAnsweredQuestions((prev) => prev + 1);
     if (isCorrect) {
       setCorrectAnswers((prev) => prev + 1);
@@ -86,12 +86,10 @@ const QuizGame: React.FC = () => {
       ]);
     }
 
-    // Move to the next question
     const nextIndex = currentQuestionIndex + 1;
     if (nextIndex < questions.length) {
       setCurrentQuestionIndex(nextIndex);
     } else {
-      // Loop back to the first question if we run out
       setCurrentQuestionIndex(0);
     }
   };
@@ -100,18 +98,43 @@ const QuizGame: React.FC = () => {
     navigate("/");
   };
 
+  // If wallet is not connected, show a connect prompt
+  if (!account) {
+    return (
+      <div className="relative min-h-screen flex flex-col items-center justify-center p-4">
+        <img
+          src={quizBg}
+          alt="background"
+          className="absolute inset-0 w-full h-full object-cover z-0"
+        />
+        <div className="relative z-20 text-white text-center">
+          <h1 className="text-3xl font-bold mb-4">Connect Your Universal Profile</h1>
+          <p className="text-lg mb-4">
+            You need to connect your Universal Profile to play the Quiz Game.
+          </p>
+          <button
+            onClick={connectWallet}
+            disabled={isConnecting}
+            className={`bg-blue-600 text-white px-6 py-2 rounded-lg text-lg font-bold hover:bg-blue-700 ${
+              isConnecting ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            {isConnecting ? "Connecting..." : "Connect Wallet"}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Game over screen
   if (gameOver) {
     return (
       <div className="relative min-h-screen flex flex-col items-center justify-center p-4">
-       {/* Background Image */}
-  <img
-    src={quizBg}
-    alt="background"
-    className="absolute inset-0 w-full h-full object-cover z-0"
-  />
-  
-
-        {/* Summary */}
+        <img
+          src={quizBg}
+          alt="background"
+          className="absolute inset-0 w-full h-full object-cover z-0"
+        />
         <div className="relative z-20 text-white text-center">
           <h1 className="text-3xl font-bold mb-4">Game Over!</h1>
           <p className="text-lg mb-2">
@@ -156,20 +179,15 @@ const QuizGame: React.FC = () => {
 
   const currentQuestion = questions[currentQuestionIndex];
 
+  // Main game screen
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center p-4">
-    
-      {/* Background Image */}
       <img
         src={quizBg}
         alt="background"
         className="absolute inset-0 w-full h-full object-cover z-0"
       />
-     
-
-      {/* Quiz Content */}
       <div className="relative z-20 w-full max-w-4xl">
-        {/* Timer and Question Counter */}
         <div className="flex justify-between items-center mb-4 text-white">
           <p className="text-lg">Time Left: {timeLeft}s</p>
           <p className="text-lg">
@@ -177,12 +195,10 @@ const QuizGame: React.FC = () => {
           </p>
         </div>
 
-        {/* Answers Label */}
         <div className="text-center text-white mb-4">
           <h2 className="text-xl font-bold">Answers</h2>
         </div>
 
-        {/* Cards */}
         <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 sm:items-end">
           <div className="relative w-full sm:w-48 md:w-64 h-64 sm:h-80 md:h-96 flex flex-col items-center justify-end">
             <img
@@ -190,7 +206,6 @@ const QuizGame: React.FC = () => {
               alt="Card"
               className="absolute inset-0 w-full h-full object-cover"
             />
-
             <div className="relative z-10 bg-white text-black px-2 sm:px-4 py-1 sm:py-2 w-3/4 text-center rounded-t-lg">
               <p className="text-sm sm:text-lg font-bold">
                 {currentQuestion.question}
@@ -203,7 +218,6 @@ const QuizGame: React.FC = () => {
               alt="Card"
               className="absolute inset-0 w-full h-full object-cover"
             />
-
             <div className="relative z-10 bg-white text-black px-2 sm:px-4 py-1 sm:py-2 w-3/4 text-center rounded-t-lg">
               <p className="text-sm sm:text-lg font-bold">The Web3 Quest</p>
             </div>
@@ -214,14 +228,12 @@ const QuizGame: React.FC = () => {
               alt="Card"
               className="absolute inset-0 w-full h-full object-cover"
             />
-
             <div className="relative z-10 bg-white text-black px-2 sm:px-4 py-1 sm:py-2 w-3/4 text-center rounded-t-lg">
               <p className="text-sm sm:text-lg font-bold">One Web3 Mep</p>
             </div>
           </div>
         </div>
 
-        {/* Answer Options */}
         <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mt-4">
           {currentQuestion.options.map((option, index) => (
             <button
