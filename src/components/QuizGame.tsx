@@ -158,7 +158,7 @@ const QuizGame: React.FC = () => {
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center p-4">
-     
+    
       {/* Background Image */}
       <img
         src={quizBg}

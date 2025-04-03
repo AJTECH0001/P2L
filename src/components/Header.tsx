@@ -1,40 +1,73 @@
-import React from 'react';
-import { FaPlus } from 'react-icons/fa';
+import React from "react";
+import { useWallet } from "../WalletContext";
 
 const Header: React.FC = () => {
+  const { account, connectWallet, disconnectWallet } = useWallet();
+
+  const truncateAddress = (address: string) => {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
   return (
-    <header className="flex flex-col md:flex-row justify-between items-center p-4 text-white space-y-4 md:space-y-0">
-      {/* Left: Profile Section */}
-      <div className="flex items-center space-x-2">
+    <header
+      className="text-white p-4 flex justify-between items-center bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border-t-2 border-yellow-500"
+      style={{
+        backgroundImage: "url('/assets/wave-pattern.png')", // Add a wave pattern if available
+        backgroundSize: "cover",
+      }}
+    >
+      {/* Profile Section */}
+      <div className="flex items-center space-x-3">
         <img
           src="/assets/profile-pic.png"
           alt="Profile"
-          className="w-10 h-10 rounded-full"
+          className="w-12 h-12 rounded-full border-2 border-yellow-500"
         />
         <div>
-          <p className="text-sm">ID: 4567822</p>
-          <p className="text-sm font-bold">MINER'S</p>
+          <p className="text-xs text-gray-300">ID: 4567822</p>
+          <p className="text-sm font-bold text-white">MINER'S</p>
         </div>
       </div>
 
-      {/* Center: Points and Cash */}
-      <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 text-center">
-        <div className="flex items-center justify-center space-x-1">
-          <span className="text-yellow-400">●</span>
-          <p>POINTS EARNED: 0 pts</p>
+      {/* Points and Cash Section */}
+      <div className="flex space-x-6">
+        <div className="flex items-center space-x-2">
+          <span className="text-yellow-400 text-2xl">●</span>
+          <div>
+            <p className="text-xs text-gray-300 uppercase">Points Earned</p>
+            <p className="text-sm font-bold">0 pts</p>
+          </div>
         </div>
-        <div className="flex items-center justify-center space-x-1">
-          <span className="text-blue-400">●</span>
-          <p>CASH EARNED: USD 5000</p>
+        <div className="flex items-center space-x-2">
+          <span className="text-blue-400 text-2xl">●</span>
+          <div>
+            <p className="text-xs text-gray-300 uppercase">Cash Earned</p>
+            <p className="text-sm font-bold">USD 5000</p>
+          </div>
         </div>
       </div>
 
-      {/* Right: Connect Button */}
-      <button className="flex items-center space-x-1 bg-gray-700 px-3 py-1 rounded">
-        <span>20206</span>
-        <FaPlus />
-        <span>Connect</span>
-      </button>
+      {/* Connect/Disconnect Button */}
+      <div>
+        {account ? (
+          <div className="flex items-center space-x-2">
+            <span className="text-sm">{truncateAddress(account)}</span>
+            <button
+              onClick={disconnectWallet}
+              className="bg-red-600 text-white px-4 py-1.5 rounded-lg font-bold text-sm hover:bg-red-700 transition"
+            >
+              Disconnect
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={connectWallet}
+            className="bg-transparent border-2 border-blue-400 text-blue-400 px-4 py-1.5 rounded-lg font-bold text-sm hover:bg-blue-400 hover:text-white transition"
+          >
+            Connect
+          </button>
+        )}
+      </div>
     </header>
   );
 };

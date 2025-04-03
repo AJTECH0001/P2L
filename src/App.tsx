@@ -5,9 +5,11 @@ import MainContent from './components/MainContent';
 import Sidebar from './components/Sidebar';
 import Benefits from './components/Benefits';
 import QuizGame from './components/QuizGame';
+import { WalletProvider } from "./WalletContext";
 
 const App: React.FC = () => {
   return (
+    <WalletProvider>
     <Router>
       <div className="relative min-h-screen">
         {/* Background Video */}
@@ -61,6 +63,7 @@ const App: React.FC = () => {
         </div>
       </div>
     </Router>
+    </WalletProvider>
   );
 };
 
