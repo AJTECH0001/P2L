@@ -14,7 +14,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [account, setAccount] = useState<string | null>(null);
   const [providers, setProviders] = useState<any[]>([]);
   const [isConnecting, setIsConnecting] = useState(false);
-  const [connectionAttempts, setConnectionAttempts] = useState(0);
+  const [, setConnectionAttempts] = useState(0);
 
   // Discover EIP-6963 providers
   useEffect(() => {
