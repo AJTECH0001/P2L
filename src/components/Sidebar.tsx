@@ -27,7 +27,25 @@ const Sidebar: React.FC = () => {
         SELECT GAMES
       </button>
 
-      {['SYMBOL', 'ABBREVIATION', 'QUIZ'].map((game) => (
+      {/* QUIZ button at the top */}
+      <button
+        className={`w-full px-4 py-2 rounded font-bold text-center align-middle font-quantico 
+          ${selectedGame === 'QUIZ'
+            ? 'bg-gray-800 bg-opacity-80 text-yellow-400'
+            : 'bg-gray-500 bg-opacity-50 text-white'
+          }`}
+        style={{
+          fontSize: 'clamp(16px, 4vw, 20px)',
+          fontWeight: 400,
+          lineHeight: '141%',
+        }}
+        onClick={() => handleGameSelect('QUIZ')}
+      >
+        QUIZ
+      </button>
+
+      {/* Other games below */}
+      {['ABBREVIATION', 'SYMBOL'].map((game) => (
         <button
           key={game}
           className={`w-full px-4 py-2 rounded font-bold text-center align-middle font-quantico 
