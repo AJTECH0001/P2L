@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useWallet } from "../WalletContext";
@@ -14,15 +13,18 @@ const QuizGame: React.FC = () => {
   const [missedQuestions, setMissedQuestions] = useState<
     { question: string; userAnswer: string; correctAnswer: string }[]
   >([]);
+  // New state to track correct answers
+  const [correctQuestions, setCorrectQuestions] = useState<
+    { question: string; correctAnswer: string }[]
+  >([]);
   const [timeLeft, setTimeLeft] = useState(60);
   const [gameOver, setGameOver] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [blink, setBlink] = useState(false);
-  const [activeCard, setActiveCard] = useState<number>(0); // Track which card (0, 1, or 2) is active
+  const [activeCard, setActiveCard] = useState<number>(0);
   const navigate = useNavigate();
 
-  // Calculate score: 100 points per correct answer
   const score = correctAnswers * 100;
 
   useEffect(() => {
@@ -42,17 +44,15 @@ const QuizGame: React.FC = () => {
     if (showFeedback) {
       const blinkInterval = setInterval(() => {
         setBlink((prev) => !prev);
-      }, 300); // Blink every 300ms
+      }, 300);
       return () => clearInterval(blinkInterval);
     }
   }, [showFeedback]);
 
-  // Determine the questions for each card
   const currentQuestion = questions[currentQuestionIndex];
   const nextQuestion = questions[(currentQuestionIndex + 1) % questions.length];
   const thirdQuestion = questions[(currentQuestionIndex + 2) % questions.length];
 
-  // Determine the active question based on the active card
   const activeQuestion =
     activeCard === 0
       ? currentQuestion
@@ -71,6 +71,14 @@ const QuizGame: React.FC = () => {
 
     if (isCorrect) {
       setCorrectAnswers((prev) => prev + 1);
+      // Add to correctQuestions
+      setCorrectQuestions((prev) => [
+        ...prev,
+        {
+          question: activeQuestion.question,
+          correctAnswer: activeQuestion.correctAnswer,
+        },
+      ]);
     } else {
       setMissedQuestions((prev) => [
         ...prev,
@@ -90,7 +98,7 @@ const QuizGame: React.FC = () => {
     setSelectedAnswer(null);
     setBlink(false);
     const nextQuestionIndex = (currentQuestionIndex + 1) % questions.length;
-    const nextCardIndex = (activeCard + 1) % 3; // Cycle through card positions (0, 1, 2)
+    const nextCardIndex = (activeCard + 1) % 3;
     setCurrentQuestionIndex(nextQuestionIndex);
     setActiveCard(nextCardIndex);
   };
@@ -133,32 +141,25 @@ const QuizGame: React.FC = () => {
             {/* Correct Answers Section */}
             <div>
               <h2 className="text-xl font-bold mb-4">Correct Answers</h2>
-              {correctAnswers > 0 ? (
-                questions
-                  .filter((q) => {
-                    const missed = missedQuestions.find(
-                      (m) => m.question === q.question
-                    );
-                    return !missed; // Show only questions that weren't missed
-                  })
-                  .map((q, index) => (
-                    <div
-                      key={index}
-                      className="bg-gray-800 p-4 rounded-lg mb-4 flex items-center"
-                    >
-                      <img
-                        src={cardImage}
-                        alt="Card"
-                        className="w-16 h-24 mr-4 object-cover"
-                      />
-                      <div className="text-left">
-                        <p className="text-sm font-bold">{q.question}</p>
-                        <p className="text-sm text-gray-400">
-                          {q.correctAnswer}
-                        </p>
-                      </div>
+              {correctQuestions.length > 0 ? (
+                correctQuestions.map((correct, index) => (
+                  <div
+                    key={index}
+                    className="bg-gray-800 p-4 rounded-lg mb-4 flex items-center"
+                  >
+                    <img
+                      src={cardImage}
+                      alt="Card"
+                      className="w-16 h-24 mr-4 object-cover"
+                    />
+                    <div className="text-left">
+                      <p className="text-sm font-bold">{correct.question}</p>
+                      <p className="text-sm text-gray-400">
+                        {correct.correctAnswer}
+                      </p>
                     </div>
-                  ))
+                  </div>
+                ))
               ) : (
                 <p className="text-gray-400">No correct answers.</p>
               )}
@@ -181,7 +182,7 @@ const QuizGame: React.FC = () => {
                     <div className="text-left">
                       <p className="text-sm font-bold">{missed.question}</p>
                       <p className="text-sm text-red-400">
-                        {missed.userAnswer}
+                        Your Answer: {missed.userAnswer}
                       </p>
                       <p className="text-sm text-green-400">
                         Correct: {missed.correctAnswer}
@@ -206,6 +207,7 @@ const QuizGame: React.FC = () => {
     );
   }
 
+  // Rest of the component (quiz gameplay UI) remains unchanged
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center p-4">
       <img src={quizBg} alt="background" className="absolute inset-0 w-full h-full object-cover z-0" />
@@ -216,7 +218,6 @@ const QuizGame: React.FC = () => {
         </div>
 
         <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 sm:items-end">
-          {/* First Card */}
           <div className="relative w-full sm:w-48 md:w-64 h-64 sm:h-80 md:h-96 flex flex-col items-center justify-between">
             <img src={cardImage} alt="Card" className="absolute inset-0 w-full h-full object-cover" />
             {activeCard === 0 && (
@@ -230,7 +231,6 @@ const QuizGame: React.FC = () => {
             )}
           </div>
 
-          {/* Second Card */}
           <div className="relative w-full sm:w-48 md:w-64 h-64 sm:h-80 md:h-96 flex flex-col items-center justify-end">
             <img src={cardImage} alt="Card" className="absolute inset-0 w-full h-full object-cover" />
             {activeCard === 1 && (
@@ -244,7 +244,6 @@ const QuizGame: React.FC = () => {
             )}
           </div>
 
-          {/* Third Card */}
           <div className="relative w-full sm:w-48 md:w-64 h-64 sm:h-80 md:h-96 flex flex-col items-center justify-end">
             <img src={cardImage} alt="Card" className="absolute inset-0 w-full h-full object-cover" />
             {activeCard === 2 && (
