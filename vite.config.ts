@@ -8,11 +8,5 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
-  server: {
-    allowedHosts: [
-      '*.loca.lt',
-      'quick-cobras-sniff.loca.lt', // Add the specific host
-      'localhost',
-    ],
-  },
+ 
 });
