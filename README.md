@@ -94,9 +94,9 @@ Follow these steps to set up the project locally:
 
 Have questions or suggestions? Reach out to us:  
 
-- **Email:** [your-email@example.com](mailto:your-email@example.com)  
-- **Twitter:** [@YourTwitterHandle](https://twitter.com/YourTwitterHandle)  
-- **Discord:** [Join our community here](your-discord-invite-link)  
+- **Email:** [your-email@example.com](mailto:Hello@Web3play2Learn.com)  
+- **Twitter:** [@YourTwitterHandle](https://twitter.com/@Web3Play2Learn)  
+- **Discord:** [Join our community here](https://discord.gg/vtGt5Qe4)  
 
 ### Happy learning, and welcome to the world of Web3 with P2L! 
 
