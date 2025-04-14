@@ -1,6 +1,6 @@
 # P2L - Play2Learn  
 
-![P2L Banner](./public/P2L.png)  
+![P2L Banner](./src/assets/flowchart.png)  
 
 P2L (Play2Learn) is an innovative Web3 educational platform that gamifies learning about cryptocurrency and blockchain technology. Through interactive quizzes and challenges, users can earn tokens, connect with a community of learners, and deepen their understanding of Web3 concepts—all while having fun!  
 
